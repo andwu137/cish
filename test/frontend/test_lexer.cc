@@ -2,18 +2,18 @@
 #include <iostream>
 #include <vector>
 
-void print_tokens(std::vector<Token> *tokens) {
+void print_tokens(std::vector<Token *> *tokens) {
   std::cout << "start print tokens" << std::endl;
-  for (Token t : *tokens) {
-    std::cout << t.type << ";" << t.position.col << ":" << t.position.row
+  for (Token *t : *tokens) {
+    std::cout << t->type << ";" << t->position.col << ":" << t->position.row
               << "\n"
-              << t.lexeme << std::endl;
+              << t->lexeme << std::endl;
   }
   std::cout << "end print tokens\n" << std::endl;
 }
 
 void test_preprocess() {
-  std::vector<Token> tokens;
+  std::vector<Token *> tokens;
   lex("#define my balls haha \n", &tokens);
   print_tokens(&tokens);
   tokens.clear();
@@ -28,7 +28,7 @@ void test_preprocess() {
 }
 
 void test_braces() {
-  std::vector<Token> tokens;
+  std::vector<Token *> tokens;
   lex("{", &tokens);
   print_tokens(&tokens);
   tokens.clear();

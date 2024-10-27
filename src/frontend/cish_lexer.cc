@@ -1,5 +1,6 @@
 #include "cish_lexer.h"
 #include "cish_syntax.h"
+#include <cstdlib>
 #include <string>
 #include <vector>
 
@@ -8,8 +9,12 @@ LexState init_lex_state(std::string_view input) {
   return {input, 0, init_position()};
 }
 
-Token new_token(LexState *state, TokenType type, std::string lexeme) {
-  return {type, lexeme, state->position};
+Token *new_token(LexState *state, TokenType type, std::string lexeme) {
+  Token *t = (Token *)std::calloc(1, sizeof(Token));
+  t->type = type;
+  t->lexeme = lexeme;
+  t->position = state->position;
+  return t;
 }
 
 bool eof(LexState *state) {
@@ -61,17 +66,16 @@ void until_eol(LexState *state, std::string *out_buf) {
   } while (next_position(state));
 }
 
-void lex(std::string_view input, std::vector<Token> *tokens) {
+void lex(std::string_view input, std::vector<Token *> *tokens) {
   LexState state = init_lex_state(input);
 
   do {
     switch (current_state(&state)) {
     // pre compilation
     case '#': {
-      Token t = new_token(&state, PRE_PROCESS, "");
+      tokens->push_back(new_token(&state, PRE_PROCESS, ""));
       next_position(&state);
-      until_eol(&state, &t.lexeme);
-      tokens->push_back(t);
+      until_eol(&state, &(*tokens).back()->lexeme);
       break;
     }
     // syntax
