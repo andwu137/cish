@@ -72,12 +72,11 @@ void lex(std::string_view input, std::vector<Token *> *tokens) {
   do {
     switch (current_state(&state)) {
     // pre compilation
-    case '#': {
+    case '#':
       tokens->push_back(new_token(&state, PRE_PROCESS, ""));
       next_position(&state);
       until_eol(&state, &(*tokens).back()->lexeme);
       break;
-    }
     // syntax
     case '{':
       tokens->push_back(new_token(&state, OPEN_BRACE, ""));
