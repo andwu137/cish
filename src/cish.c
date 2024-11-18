@@ -43,6 +43,23 @@ int main(int argc, char **argv) {
     case TOKEN_IDENTIFIER: {
       dbg("%s\n", "IDENTIFIER");
     } break;
+
+    case TOKEN_IF: {
+      dbg("%s\n", "IF");
+    } break;
+    case TOKEN_ELSE: {
+      dbg("%s\n", "ELSE");
+    } break;
+    case TOKEN_FOR: {
+      dbg("%s\n", "FOR");
+    } break;
+    case TOKEN_RETURN: {
+      dbg("%s\n", "RETURN");
+    } break;
+    case TOKEN_WHILE: {
+      dbg("%s\n", "WHILE");
+    } break;
+
     case TOKEN_CHAR: {
       dbg("%s\n", "CHAR");
     } break;
@@ -60,14 +77,14 @@ int main(int argc, char **argv) {
       dbg("%s\n", "ASSIGN");
     } break;
 
-    case TOKEN_NOT: {
-      dbg("%s\n", "NOT");
+    case TOKEN_BANG: {
+      dbg("%s\n", "BANG");
     } break;
     case TOKEN_EQUAL: {
       dbg("%s\n", "EQUAL");
     } break;
-    case TOKEN_NOT_EQUAL: {
-      dbg("%s\n", "NOT_EQUAL");
+    case TOKEN_BANG_EQUAL: {
+      dbg("%s\n", "BANG_EQUAL");
     } break;
     case TOKEN_LESS_THAN: {
       dbg("%s\n", "LESS_THAN");
