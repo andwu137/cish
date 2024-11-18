@@ -1,0 +1,75 @@
+#ifndef CISH_CONSTANTS_C
+#define CISH_CONSTANTS_C
+
+#include <stddef.h>
+
+/* GLOBAL */
+#define DEBUG 1
+
+#define FILE_READ_BUF_SIZE (100)
+
+/* Return */
+typedef enum ReturnType {
+  RETURN_SUCCESS,
+  ALLOCATION_ERROR, // GENERAL
+  FILE_OPEN_ERROR,  // FILES
+  LEXER_ERROR,      // LEXER
+  LEXER_UNEXPECTED_CHAR,
+  LEXER_UNEXPECTED_EOF,
+  PARSER_ERROR, // PARSER
+} ReturnType;
+
+/* LEXER */
+typedef enum TokenType {
+  TOKEN_TYPE_NAME,
+  TOKEN_IDENTIFIER,
+
+  TOKEN_CHAR,
+  TOKEN_STRING,
+  TOKEN_INTEGER,
+  TOKEN_FLOAT,
+
+  TOKEN_ASSIGN,
+
+  TOKEN_NOT,
+  TOKEN_EQUAL,
+  TOKEN_NOT_EQUAL,
+  TOKEN_LESS_THAN,
+  TOKEN_LESS_THAN_EQUAL,
+  TOKEN_GREATER_THAN,
+  TOKEN_GREATER_THAN_EQUAL,
+
+  TOKEN_SLASH,
+  TOKEN_DASH,
+  TOKEN_PLUS,
+
+  TOKEN_ASTERISK,
+  TOKEN_AMPERSAND,
+
+  TOKEN_BIT_SHIFT_RIGHT,
+  TOKEN_BIT_SHIFT_LEFT,
+
+  TOKEN_OPEN_PAREN,
+  TOKEN_CLOSE_PAREN,
+
+  TOKEN_OPEN_BRACKET,
+  TOKEN_CLOSE_BRACKET,
+
+  TOKEN_OPEN_BRACE,
+  TOKEN_CLOSE_BRACE,
+
+  TOKEN_COMMA,
+  TOKEN_SEMICOLON,
+} TokenType;
+
+typedef struct Token {
+  enum TokenType type;
+  char *identifier;
+} Token;
+
+typedef struct Pos {
+  size_t col;
+  size_t row;
+} Pos;
+
+#endif // !CISH_CONSTANTS_C
