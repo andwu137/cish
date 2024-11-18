@@ -66,11 +66,11 @@ ReturnType lex(FILE *fptr, Token **outTokens, size_t *tokensEndPos) {
         case '=': {
           next_pos(&pos, buf[++i]);
           push_back_token(outTokens, &tokensLen, tokensEndPos,
-                          new_token(TOKEN_NOT_EQUAL, NULL));
+                          new_token(TOKEN_BANG_EQUAL, NULL));
         } break;
         default: {
           push_back_token(outTokens, &tokensLen, tokensEndPos,
-                          new_token(TOKEN_NOT, NULL));
+                          new_token(TOKEN_BANG, NULL));
         } break;
         }
       } break;
