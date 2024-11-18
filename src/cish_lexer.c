@@ -230,7 +230,11 @@ static inline Pos init_pos() {
 }
 
 static inline ReturnType unexpected_char(Pos pos, char c) {
-  fprintf(stderr, "Unexpected '%c' at %lu, %lu", c, pos.col, pos.row);
+  if (c != '\n') {
+    fprintf(stderr, "Unexpected '%c' at %lu, %lu", c, pos.col, pos.row);
+  } else {
+    fprintf(stderr, "Unexpected '\\n' at %lu, %lu", pos.col, pos.row);
+  }
   return LEXER_UNEXPECTED_CHAR;
 }
 
