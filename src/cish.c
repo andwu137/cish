@@ -38,115 +38,115 @@ int main(int argc, char **argv) {
   for (size_t i = 0; i < tokensLen; i++) {
     switch (tokens[i].type) {
     case TOKEN_TYPE_NAME: {
-      dbg("%s\n", "TYPE_NAME");
+      dbg("%s", "TYPE_NAME");
     } break;
     case TOKEN_IDENTIFIER: {
-      dbg("%s\n", "IDENTIFIER");
+      dbg("%s", "IDENTIFIER");
     } break;
 
     case TOKEN_IF: {
-      dbg("%s\n", "IF");
+      dbg("%s", "if");
     } break;
     case TOKEN_ELSE: {
-      dbg("%s\n", "ELSE");
+      dbg("%s", "else");
     } break;
     case TOKEN_FOR: {
-      dbg("%s\n", "FOR");
+      dbg("%s", "for");
     } break;
     case TOKEN_RETURN: {
-      dbg("%s\n", "RETURN");
+      dbg("%s", "return");
     } break;
     case TOKEN_WHILE: {
-      dbg("%s\n", "WHILE");
+      dbg("%s", "while");
     } break;
 
     case TOKEN_CHAR: {
-      dbg("%s\n", "CHAR");
+      dbg("%s", "CHAR");
     } break;
     case TOKEN_STRING: {
-      dbg("%s\n", "STRING");
+      dbg("%s", "STRING");
     } break;
     case TOKEN_INTEGER: {
-      dbg("%s\n", "INTEGER");
+      dbg("%s", "INTEGER");
     } break;
     case TOKEN_FLOAT: {
-      dbg("%s\n", "FLOAT");
+      dbg("%s", "FLOAT");
     } break;
 
-    case TOKEN_ASSIGN: {
-      dbg("%s\n", "ASSIGN");
+    case TOKEN_EQUAL: {
+      dbg("%s", "=");
     } break;
 
     case TOKEN_BANG: {
-      dbg("%s\n", "BANG");
+      dbg("%s", "!");
     } break;
-    case TOKEN_EQUAL: {
-      dbg("%s\n", "EQUAL");
+    case TOKEN_EQUAL_EQUAL: {
+      dbg("%s", "==");
     } break;
     case TOKEN_BANG_EQUAL: {
-      dbg("%s\n", "BANG_EQUAL");
+      dbg("%s", "!=");
     } break;
     case TOKEN_LESS_THAN: {
-      dbg("%s\n", "LESS_THAN");
+      dbg("%s", "<");
     } break;
     case TOKEN_LESS_THAN_EQUAL: {
-      dbg("%s\n", "LESS_THAN_EQUAL");
+      dbg("%s", "<=");
     } break;
     case TOKEN_GREATER_THAN: {
-      dbg("%s\n", "GREATER_THAN");
+      dbg("%s", ">");
     } break;
     case TOKEN_GREATER_THAN_EQUAL: {
-      dbg("%s\n", "GREATER_THAN_EQUAL");
+      dbg("%s", ">=");
     } break;
 
     case TOKEN_SLASH: {
-      dbg("%s\n", "SLASH");
+      dbg("%s", "/");
     } break;
     case TOKEN_DASH: {
-      dbg("%s\n", "DASH");
+      dbg("%s", "-");
     } break;
     case TOKEN_PLUS: {
-      dbg("%s\n", "PLUS\n");
+      dbg("%s", "+");
     } break;
 
     case TOKEN_ASTERISK: {
-      dbg("%s\n", "ASTERISK");
+      dbg("%s", "*");
     } break;
     case TOKEN_AMPERSAND: {
-      dbg("%s\n", "AMPERSAND");
+      dbg("%s", "&");
     } break;
 
-    case TOKEN_BIT_SHIFT_RIGHT: {
-      dbg("%s\n", "BIT_SHIFT_RIGHT");
+    case TOKEN_RIGHT_RIGHT: {
+      dbg("%s", ">>");
     } break;
-    case TOKEN_BIT_SHIFT_LEFT: {
-      dbg("%s\n", "BIT_SHIFT_LEFT");
+    case TOKEN_LEFT_LEFT: {
+      dbg("%s", "<<");
     } break;
 
     case TOKEN_OPEN_PAREN: {
-      dbg("%s\n", "OPEN_PAREN");
+      dbg("%s", "(");
     } break;
     case TOKEN_CLOSE_PAREN: {
-      dbg("%s\n", "CLOSE_PAREN");
+      dbg("%s", ")");
     } break;
     case TOKEN_OPEN_BRACKET: {
-      dbg("%s\n", "OPEN_BRACKET");
+      dbg("%s", "[");
     } break;
     case TOKEN_CLOSE_BRACKET: {
-      dbg("%s\n", "CLOSE_BRACKET");
+      dbg("%s", "]");
     } break;
     case TOKEN_OPEN_BRACE: {
-      dbg("%s\n", "OPEN_BRACE");
+      dbg("%s", "{");
     } break;
     case TOKEN_CLOSE_BRACE: {
-      dbg("%s\n", "CLOSE_BRACE");
+      dbg("%s", "}");
     } break;
 
     case TOKEN_COMMA: {
-      dbg("%s\n", "COMMA");
+      dbg("%s", ",");
     } break;
     case TOKEN_SEMICOLON: {
-      dbg("%s\n", "SEMICOLON");
+      dbg("%s", ";");
     } break;
     }
 
@@ -157,6 +157,8 @@ int main(int argc, char **argv) {
   }
 
   free(tokens);
+
+  puts("");
 
   return 0;
 }

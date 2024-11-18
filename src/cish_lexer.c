@@ -52,11 +52,11 @@ ReturnType lex(FILE *fptr, Token **outTokens, size_t *tokensEndPos) {
         case '=': {
           next_pos(&pos, buf[i++]);
           push_back_token(outTokens, &tokensLen, tokensEndPos,
-                          new_token(TOKEN_EQUAL, NULL));
+                          new_token(TOKEN_EQUAL_EQUAL, NULL));
         } break;
         default: {
           push_back_token(outTokens, &tokensLen, tokensEndPos,
-                          new_token(TOKEN_ASSIGN, NULL));
+                          new_token(TOKEN_EQUAL, NULL));
         } break;
         }
       } break;
@@ -80,7 +80,7 @@ ReturnType lex(FILE *fptr, Token **outTokens, size_t *tokensEndPos) {
         case '<': {
           next_pos(&pos, buf[i]++);
           push_back_token(outTokens, &tokensLen, tokensEndPos,
-                          new_token(TOKEN_BIT_SHIFT_LEFT, NULL));
+                          new_token(TOKEN_LEFT_LEFT, NULL));
         } break;
         default: {
           push_back_token(outTokens, &tokensLen, tokensEndPos,
@@ -94,7 +94,7 @@ ReturnType lex(FILE *fptr, Token **outTokens, size_t *tokensEndPos) {
         case '>': {
           next_pos(&pos, buf[i]++);
           push_back_token(outTokens, &tokensLen, tokensEndPos,
-                          new_token(TOKEN_BIT_SHIFT_RIGHT, NULL));
+                          new_token(TOKEN_RIGHT_RIGHT, NULL));
         } break;
         default: {
           push_back_token(outTokens, &tokensLen, tokensEndPos,
