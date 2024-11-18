@@ -50,8 +50,7 @@ ReturnType lex(FILE *fptr, Token **outTokens, size_t *tokensEndPos) {
       case '=': {
         switch (peek_buf_stream(readSize, i, buf)) {
         case '=': {
-          i++;
-          next_pos(&pos, '=');
+          next_pos(&pos, buf[i++]);
           push_back_token(outTokens, &tokensLen, tokensEndPos,
                           new_token(TOKEN_EQUAL, NULL));
         } break;
@@ -65,8 +64,7 @@ ReturnType lex(FILE *fptr, Token **outTokens, size_t *tokensEndPos) {
       case '!': {
         switch (peek_buf_stream(readSize, i, buf)) {
         case '=': {
-          i++;
-          next_pos(&pos, '=');
+          next_pos(&pos, buf[++i]);
           push_back_token(outTokens, &tokensLen, tokensEndPos,
                           new_token(TOKEN_NOT_EQUAL, NULL));
         } break;
@@ -80,8 +78,7 @@ ReturnType lex(FILE *fptr, Token **outTokens, size_t *tokensEndPos) {
       case '<': {
         switch (peek_buf_stream(readSize, i, buf)) {
         case '<': {
-          i++;
-          next_pos(&pos, '=');
+          next_pos(&pos, buf[i]++);
           push_back_token(outTokens, &tokensLen, tokensEndPos,
                           new_token(TOKEN_BIT_SHIFT_LEFT, NULL));
         } break;
@@ -95,8 +92,7 @@ ReturnType lex(FILE *fptr, Token **outTokens, size_t *tokensEndPos) {
       case '>': {
         switch (peek_buf_stream(readSize, i, buf)) {
         case '>': {
-          i++;
-          next_pos(&pos, '=');
+          next_pos(&pos, buf[i]++);
           push_back_token(outTokens, &tokensLen, tokensEndPos,
                           new_token(TOKEN_BIT_SHIFT_RIGHT, NULL));
         } break;
@@ -110,11 +106,9 @@ ReturnType lex(FILE *fptr, Token **outTokens, size_t *tokensEndPos) {
       case '/': {
         switch (peek_buf_stream(readSize, i, buf)) {
         case '/': {
-          i++;
-          next_pos(&pos, '=');
+          next_pos(&pos, buf[i++]);
           while (peek_buf_stream(readSize, i, buf) != '\n') {
-            next_pos(&pos, buf[i]);
-            i++;
+            next_pos(&pos, buf[i++]);
           }
         } break;
         default: {
