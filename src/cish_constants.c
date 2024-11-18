@@ -6,7 +6,9 @@
 /* GLOBAL */
 #define DEBUG 1
 
-#define FILE_READ_BUF_SIZE (100)
+#define FILE_READ_BUF_SIZE (128)
+#define TOKEN_READ_BUF_SIZE (1 << 17)
+#define STRING_READ_BUF_SIZE (128)
 
 /* Return */
 typedef enum ReturnType {
