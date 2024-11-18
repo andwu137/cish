@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
       dbg("%s", "CHAR");
     } break;
     case TOKEN_STRING: {
-      dbg("%s", "STRING");
+      dbg("\"%s\"", tokens[i].identifier);
     } break;
     case TOKEN_INTEGER: {
       dbg("%s", "INTEGER");

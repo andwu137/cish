@@ -16,18 +16,25 @@ static inline Token *init_tokens(size_t nmemb);
 static inline Token new_token(TokenType type, char *identifier);
 static inline void push_back_token(Token **ts, size_t *length, size_t *pos,
                                    Token t);
+static inline void push_back_string(char **str, size_t *length, size_t *pos,
+                                    char c);
 static inline char peek_buf_stream(size_t readSize, size_t pos, char *buf);
 ReturnType lex(FILE *fptr, Token **outTokens, size_t *tokensLen);
 
 /* LEXER */
 ReturnType lex(FILE *fptr, Token **outTokens, size_t *tokensEndPos) {
+  Pos pos = init_pos();
+
   size_t readSize = 0;
   char buf[FILE_READ_BUF_SIZE];
-  Pos pos = init_pos();
+
   *tokensEndPos = 0;
-  size_t tokensLen = 1 << 17;
+  size_t tokensLen = TOKEN_READ_BUF_SIZE;
   *outTokens = init_tokens(tokensLen);
+
   char *tempIdent;
+  size_t tempIdentIdx;
+  size_t tempIdentLength;
 
   while (1) {
     readSize = fread(buf, 1, FILE_READ_BUF_SIZE - 1, fptr);
@@ -180,12 +187,39 @@ ReturnType lex(FILE *fptr, Token **outTokens, size_t *tokensEndPos) {
       } break;
 
       case '"': {
-        if (peek_buf_stream(readSize, i, buf) == '\'') {
-          return unexpected_char(pos, buf[i]);
-        } else {
-          // TODO: read the whole string in
+        tempIdentLength = STRING_READ_BUF_SIZE;
+        tempIdent = (char *)calloc_or_die(tempIdentLength, sizeof(char));
+        next_pos(&pos, buf[i++]);
+        if (peek_buf_stream(readSize, i, buf) != 0) {
+          tempIdentIdx = 0;
+          while (1) {
+            switch (peek_buf_stream(readSize, i, buf)) {
+            case '\n': {
+              return unexpected_char(pos, '\n');
+            } break;
+
+            case '"': {
+              next_pos(&pos, buf[i++]);
+              goto END_STRING_LOOP;
+            } break;
+
+              // TODO: "string with \" inside of it"
+              // case '\\': {
+              //   next_pos(&pos, buf[i++]);
+              // } break;
+
+            default: {
+              push_back_string(&tempIdent, &tempIdentLength, &tempIdentIdx,
+                               buf[i]);
+              next_pos(&pos, buf[i++]);
+            } break;
+            }
+          }
+
+        END_STRING_LOOP:
+          tempIdent[tempIdentIdx + 1] = 0;
           push_back_token(outTokens, &tokensLen, tokensEndPos,
-                          new_token(TOKEN_STRING, NULL));
+                          new_token(TOKEN_STRING, tempIdent));
         }
       } break;
 
@@ -252,6 +286,22 @@ static inline Token new_token(TokenType type, char *identifier) {
   return t;
 }
 
+static inline void push_back_string(char **str, size_t *length, size_t *pos,
+                                    char c) {
+  if (*length <= *pos) {
+    *length = (*length) << 1;
+    char *temp = (char *)realloc(*str, *length);
+    if (temp == NULL) {
+      fprintf(stderr, "Failed to allocate %lu tokens", *length);
+      exit(ALLOCATION_ERROR);
+    }
+    *str = temp;
+  }
+
+  (*str)[*pos] = c;
+  (*pos)++;
+}
+
 static inline void push_back_token(Token **ts, size_t *length, size_t *pos,
                                    Token t) {
   if (*length <= *pos) {
@@ -262,10 +312,9 @@ static inline void push_back_token(Token **ts, size_t *length, size_t *pos,
       exit(ALLOCATION_ERROR);
     }
     *ts = temp;
-  } else {
-    (*ts)[*pos] = t;
   }
 
+  (*ts)[*pos] = t;
   (*pos)++;
 }
 
