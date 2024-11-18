@@ -112,7 +112,7 @@ ReturnType lex(FILE *fptr, Token **outTokens, size_t *tokensEndPos) {
         case '/': {
           i++;
           next_pos(&pos, '=');
-          while (readSize <= i + 1 && buf[i + 1] != '\n') {
+          while (peek_buf_stream(readSize, i, buf) != '\n') {
             next_pos(&pos, buf[i]);
             i++;
           }
