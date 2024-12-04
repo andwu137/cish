@@ -165,8 +165,6 @@ char ident(const char *buf, long fileSize, long *pos, struct token *token) {
   token->type = TOKEN_IDENT;
   token->string_size = str.size;
   token->string = str.buffer;
-  fwrite(str.buffer, str.size, sizeof(char), stdout);
-  puts("");
 
   return 1;
 }
