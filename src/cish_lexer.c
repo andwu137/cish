@@ -142,11 +142,6 @@ void lex(const char *filename) {
   free(fileBuf);
 }
 
-/*token_expect(struct token_array* tokens, const char* target, size_t
- * targetSize) {*/
-/*  return*/
-/*}*/
-
 char ident(const char *buf, long fileSize, long *pos, struct token *token) {
   if (!isalpha(buf[*pos])) {
     return 0;

@@ -52,7 +52,6 @@ void token_array_delete(struct token_array *arr) {
   arr->buffer = NULL;
 }
 
-// NOTE: stack copy could be expensive
 void token_array_push(struct token_array *arr, ELEM_TYPE *x) {
   invariants(arr);
 
