@@ -10,6 +10,7 @@
 /* PROTOTYPES */
 void lex(const char *filename);
 char ident(const char *buf, long fileSize, long *pos, struct token *token);
+char valid_ident_char(char c);
 
 /* FUNCTIONS */
 void lex(const char *filename) {
@@ -142,15 +143,21 @@ void lex(const char *filename) {
   free(fileBuf);
 }
 
+char valid_ident_char(char c) {
+  return isalnum(c) || c == '-' || c == '+' || c == '=' || c == '_' ||
+         c == '!' || c == '@' || c == '#' || c == '$' || c == '%' || c == '%' ||
+         c == '^' || c == '&' || c == '*' || c == '/' || c == '~';
+}
+
 char ident(const char *buf, long fileSize, long *pos, struct token *token) {
-  if (!isalpha(buf[*pos])) {
+  if (!valid_ident_char(buf[*pos])) {
     return 0;
   }
 
   struct string str = string_new(1 << 5);
   string_push(&str, buf[*pos]);
 
-  while (isalnum(buf[++*pos])) {
+  while (valid_ident_char(buf[++*pos])) {
     string_push(&str, buf[*pos]);
   }
   --*pos;
