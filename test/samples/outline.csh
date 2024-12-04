@@ -5,8 +5,8 @@ fn (main argc argv) {
 }
 
 fn (fib n) {
-    vr ((= x (- n 1))
-        (= y (- n 2))) {
+    df ((x) {(- n 1)}
+        (y) {(- n 2)}) {
         (+ (fib x) (fib y))
     }
 }

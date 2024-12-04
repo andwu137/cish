@@ -4,32 +4,64 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
+/* DEFINES */
+#define max(a, b)                                                              \
+  ({                                                                           \
+    __typeof__(a) __max_a__ = (a);                                             \
+    __typeof__(b) __max_b__ = (b);                                             \
+    __max_a__ > __max_b__ ? __max_a__ : __max_b__;                             \
+  })
+
+#define min(a, b)                                                              \
+  ({                                                                           \
+    __typeof__(a) __min_a__ = (a);                                             \
+    __typeof__(b) __min_b__ = (b);                                             \
+    __min_a__ < __min_b__ ? __min_a__ : __min_b__;                             \
+  })
+
 /* PROTOTYPES */
-long getFileSize(FILE *fptr);
-int readFile(const char *filename, char **outBuf, long *outBufSize);
+char getFileSize(const char *filename, long *size);
+char readFile(const char *filename, char **outBuf, long *outBufSize);
 
 /* FUNCTIONS */
-long getFileSize(FILE *fptr) {
-  fseek(fptr, 0, SEEK_END);
-  long size = ftell(fptr);
-  fseek(fptr, 0, SEEK_SET);
-  return size;
-}
-
-int readFile(const char *filename, char **outBuf, long *outBufSize) {
-  FILE *fptr = fopen(filename, "r"); // NOTE: this is buffered
-  if (fptr == NULL) {
-    return -1;
+char getFileSize(const char *filename, long *size) {
+  struct stat st;
+  if (stat(filename, &st)) {
+    return 0;
   }
 
-  *outBufSize = getFileSize(fptr);
-  *outBuf = calloc(*outBufSize, sizeof(**outBuf));
-  fread(*outBuf, *outBufSize, sizeof(**outBuf), fptr);
+  *size = st.st_size;
+  return 1;
+}
 
+char readFile(const char *filename, char **outBuf, long *outBufSize) {
+  char retval = 0;
+
+  if (!getFileSize(filename, outBufSize)) {
+    goto EXIT;
+  }
+  *outBuf = calloc(*outBufSize, sizeof(**outBuf));
+
+  FILE *fptr = fopen(filename, "r"); // NOTE: this is buffered
+  if (fptr == NULL) {
+    goto FILE_EXIT;
+  }
+
+  if (!fread(*outBuf, *outBufSize, sizeof(**outBuf), fptr)) {
+    free(*outBuf);
+    *outBuf = NULL;
+    goto FILE_EXIT;
+  }
+
+  retval = 1;
+
+FILE_EXIT:
   fclose(fptr);
-  return 0;
+EXIT:
+  return retval;
 }
 
 #endif // !CISH_UTILS_C

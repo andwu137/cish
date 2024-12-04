@@ -1,2 +1,2 @@
 all:
-	gcc src/cish.c -o build/cish
+	gcc -Wall src/cish.c -o build/cish
