@@ -153,6 +153,7 @@ char ident(const char *buf, long fileSize, long *pos, struct token *token) {
   while (isalnum(buf[++*pos])) {
     string_push(&str, buf[*pos]);
   }
+  --*pos;
 
   token->type = TOKEN_IDENT;
   token->string_size = str.size;
