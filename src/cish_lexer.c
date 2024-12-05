@@ -9,8 +9,10 @@
 
 /* PROTOTYPES */
 void lex(const char *filename);
-char ident(const char *buf, long fileSize, long *pos, struct token *token);
 char valid_ident_char(char c);
+void next_pos(char c, size_t *col, size_t *row);
+char ident(const char *buf, long fileSize, long *pos, size_t *col, size_t *row,
+           struct token *token);
 
 /* FUNCTIONS */
 void lex(const char *filename) {
@@ -28,16 +30,11 @@ void lex(const char *filename) {
 
   struct token_array tokens = token_array_new(1 << 17);
   struct token bufTok;
-  size_t col = 1;
+  size_t col = 0;
   size_t row = 1;
 
   for (long i = 0; i < fileSize; i++) {
-    if (fileBuf[i] == '\n') {
-      col = 1;
-      row++;
-    } else {
-      col++;
-    }
+    next_pos(fileBuf[i], &col, &row);
     bufTok.col = col;
     bufTok.row = row;
     bufTok.string = NULL;
@@ -66,7 +63,7 @@ void lex(const char *filename) {
     } break;
 
     default: {
-      if (ident(fileBuf, fileSize, &i, &bufTok)) {
+      if (ident(fileBuf, fileSize, &i, &col, &row, &bufTok)) {
         if (strncmp(bufTok.string, "fn", min(2, bufTok.string_size)) == 0) {
           free(bufTok.string);
           bufTok.string = NULL;
@@ -149,7 +146,17 @@ char valid_ident_char(char c) {
          c == '^' || c == '&' || c == '*' || c == '/' || c == '~';
 }
 
-char ident(const char *buf, long fileSize, long *pos, struct token *token) {
+void next_pos(char c, size_t *col, size_t *row) {
+  if (c == '\n') {
+    *col = 0;
+    ++*row;
+  } else {
+    ++*col;
+  }
+}
+
+char ident(const char *buf, long fileSize, long *pos, size_t *col, size_t *row,
+           struct token *token) {
   if (!valid_ident_char(buf[*pos])) {
     return 0;
   }
@@ -158,6 +165,7 @@ char ident(const char *buf, long fileSize, long *pos, struct token *token) {
   string_push(&str, buf[*pos]);
 
   while ((*pos + 1) < fileSize && valid_ident_char(buf[++*pos])) {
+    next_pos(buf[*pos], col, row);
     string_push(&str, buf[*pos]);
   }
   --*pos;
