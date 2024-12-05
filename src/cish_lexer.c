@@ -157,7 +157,7 @@ char ident(const char *buf, long fileSize, long *pos, struct token *token) {
   struct string str = string_new(1 << 5);
   string_push(&str, buf[*pos]);
 
-  while (valid_ident_char(buf[++*pos])) {
+  while ((*pos + 1) < fileSize && valid_ident_char(buf[++*pos])) {
     string_push(&str, buf[*pos]);
   }
   --*pos;
