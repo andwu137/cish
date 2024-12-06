@@ -20,8 +20,10 @@ This is a language built by me, for me. I am unexperienced with good language de
 - [ ] nothing
 ## Optimizer
 - [ ] null
+## Interpreter on AST
+- [ ] nullopt
 ## IR to Targets
-- [ ] Bytecode & Interpreter?
+- [ ] Bytecode?
 - [ ] Assembly / Binary?
 ## Error Handling
 - [ ] not yet lol
