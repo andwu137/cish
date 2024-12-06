@@ -217,9 +217,8 @@ int try(int (*parser)(const char *buf, long fileSize, struct source_pos *sp,
 int many(int (*predicate)(int), const char *buf, long fileSize,
          struct source_pos *sp, struct token *token) {
   struct string str = string_new(1 << 5);
-  string_push(&str, buf[sp->pos]);
 
-  while ((sp->pos + 1) < fileSize && predicate(buf[++(sp->pos)])) {
+  for (; sp->pos < fileSize && predicate(buf[sp->pos]); sp->pos++) {
     next_pos(buf[sp->pos], &sp->col, &sp->row);
     string_push(&str, buf[sp->pos]);
   }
@@ -244,7 +243,6 @@ int ident_(const char *buf, long fileSize, struct source_pos *sp,
 
 int int_(const char *buf, long fileSize, struct source_pos *sp,
          struct token *token) {
-  /*puts("here");*/
   if (!isdigit(buf[sp->pos])) {
     return 0;
   }
