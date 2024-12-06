@@ -10,22 +10,22 @@
 /* PROTOTYPES */
 void lex(const char *filename);
 
-int many(int (*predicate)(int), const char *buf, long fileSize, long *pos,
-         size_t *col, size_t *row, struct token *token);
-int try(int (*parser)(const char *buf, long fileSize, long *pos, size_t *col,
-                      size_t *row, struct token *token),
-        const char *buf, long fileSize, long *pos, size_t *col, size_t *row,
+int many(int (*predicate)(int), const char *buf, long fileSize,
+         struct source_pos *sp, struct token *token);
+int try(int (*parser)(const char *buf, long fileSize, struct source_pos *sp,
+                      struct token *token),
+        const char *buf, long fileSize, struct source_pos *sp,
         struct token *token);
 
 int valid_ident_char(int c);
 
-void next_pos(char c, size_t *col, size_t *row);
+void next_pos(char c, long *col, long *row);
 
-int ident_(const char *buf, long fileSize, long *pos, size_t *col, size_t *row,
+int ident_(const char *buf, long fileSize, struct source_pos *sp,
            struct token *token);
-int float_(const char *buf, long fileSize, long *pos, size_t *col, size_t *row,
+int float_(const char *buf, long fileSize, struct source_pos *sp,
            struct token *token);
-int int_(const char *buf, long fileSize, long *pos, size_t *col, size_t *row,
+int int_(const char *buf, long fileSize, struct source_pos *sp,
          struct token *token);
 
 /* FUNCTIONS */
@@ -44,56 +44,55 @@ void lex(const char *filename) {
 
   struct token_array tokens = token_array_new(1 << 17);
   struct token bufTok;
-  size_t col = 0;
-  size_t row = 1;
+  struct source_pos sp = {.pos = 0, .col = 0, .row = 1};
 
-  for (long i = 0; i < fileSize;) {
-    next_pos(fileBuf[i], &col, &row);
-    bufTok.col = col;
-    bufTok.row = row;
+  while (sp.pos < fileSize) {
+    next_pos(fileBuf[sp.pos], &sp.col, &sp.row);
+    bufTok.col = sp.col;
+    bufTok.row = sp.row;
     bufTok.string = NULL;
 
-    switch (fileBuf[i]) {
+    switch (fileBuf[sp.pos]) {
     case '[': {
       bufTok.type = TOKEN_OPEN_BRACKET;
       token_array_push(&tokens, &bufTok);
-      i++;
+      sp.pos++;
     } break;
     case ']': {
       bufTok.type = TOKEN_CLOSE_BRACKET;
       token_array_push(&tokens, &bufTok);
-      i++;
+      sp.pos++;
     } break;
 
     case '(': {
       bufTok.type = TOKEN_OPEN_PAREN;
       token_array_push(&tokens, &bufTok);
-      i++;
+      sp.pos++;
     } break;
     case ')': {
       bufTok.type = TOKEN_CLOSE_PAREN;
       token_array_push(&tokens, &bufTok);
-      i++;
+      sp.pos++;
     } break;
 
     case '{': {
       bufTok.type = TOKEN_OPEN_BRACE;
       token_array_push(&tokens, &bufTok);
-      i++;
+      sp.pos++;
     } break;
     case '}': {
       bufTok.type = TOKEN_CLOSE_BRACE;
       token_array_push(&tokens, &bufTok);
-      i++;
+      sp.pos++;
     } break;
 
     case '\'': {
       // char
-      i++;
+      sp.pos++;
     } break;
 
     default: {
-      if (ident_(fileBuf, fileSize, &i, &col, &row, &bufTok)) {
+      if (ident_(fileBuf, fileSize, &sp, &bufTok)) {
         if (strncmp(bufTok.string, "fn", min(2, bufTok.string_size)) == 0) {
           free(bufTok.string);
           bufTok.string = NULL;
@@ -106,11 +105,11 @@ void lex(const char *filename) {
         }
 
         token_array_push(&tokens, &bufTok);
-      } else if (try(float_, fileBuf, fileSize, &i, &col, &row, &bufTok) ||
-                 int_(fileBuf, fileSize, &i, &col, &row, &bufTok)) {
+      } else if (try(float_, fileBuf, fileSize, &sp, &bufTok) ||
+                 int_(fileBuf, fileSize, &sp, &bufTok)) {
         token_array_push(&tokens, &bufTok);
       } else {
-        i++;
+        sp.pos++;
       }
     } break;
     }
@@ -184,7 +183,7 @@ int valid_ident_char(int c) {
          c == '^' || c == '&' || c == '*' || c == '/' || c == '~';
 }
 
-void next_pos(char c, size_t *col, size_t *row) {
+void next_pos(char c, long *col, long *row) {
   if (c == '\n') {
     *col = 0;
     ++*row;
@@ -193,36 +192,36 @@ void next_pos(char c, size_t *col, size_t *row) {
   }
 }
 
-int try(int (*parser)(const char *buf, long fileSize, long *pos, size_t *col,
-                      size_t *row, struct token *token),
-        const char *buf, long fileSize, long *pos, size_t *col, size_t *row,
+int try(int (*parser)(const char *buf, long fileSize, struct source_pos *sp,
+                      struct token *token),
+        const char *buf, long fileSize, struct source_pos *sp,
         struct token *token) {
-  long p = *pos;
-  size_t c = *col;
-  size_t r = *row;
-  if (!parser(buf, fileSize, pos, col, row, token)) {
+  long p = sp->pos;
+  size_t c = sp->col;
+  size_t r = sp->row;
+  if (!parser(buf, fileSize, sp, token)) {
     if (token->string != NULL) {
       free(token->string);
       token->string = NULL;
     }
 
-    *pos = p;
-    *col = c;
-    *row = r;
+    sp->pos = p;
+    sp->col = c;
+    sp->row = r;
     return 0;
   }
 
   return 1;
 }
 
-int many(int (*predicate)(int), const char *buf, long fileSize, long *pos,
-         size_t *col, size_t *row, struct token *token) {
+int many(int (*predicate)(int), const char *buf, long fileSize,
+         struct source_pos *sp, struct token *token) {
   struct string str = string_new(1 << 5);
-  string_push(&str, buf[*pos]);
+  string_push(&str, buf[sp->pos]);
 
-  while ((*pos + 1) < fileSize && predicate(buf[++*pos])) {
-    next_pos(buf[*pos], col, row);
-    string_push(&str, buf[*pos]);
+  while ((sp->pos + 1) < fileSize && predicate(buf[++(sp->pos)])) {
+    next_pos(buf[sp->pos], &sp->col, &sp->row);
+    string_push(&str, buf[sp->pos]);
   }
 
   token->string_size = str.size;
@@ -231,51 +230,49 @@ int many(int (*predicate)(int), const char *buf, long fileSize, long *pos,
   return 1;
 }
 
-int ident_(const char *buf, long fileSize, long *pos, size_t *col, size_t *row,
+int ident_(const char *buf, long fileSize, struct source_pos *sp,
            struct token *token) {
   // NOTE: inefficient, checks, then unchecks digit
-  if (!valid_ident_char(buf[*pos]) || isdigit(buf[*pos])) {
+  if (!valid_ident_char(buf[sp->pos]) || isdigit(buf[sp->pos])) {
     return 0;
   }
 
-  char ret = many(valid_ident_char, buf, fileSize, pos, col, row, token);
+  char ret = many(valid_ident_char, buf, fileSize, sp, token);
   token->type = TOKEN_IDENT;
   return ret;
 }
 
-int int_(const char *buf, long fileSize, long *pos, size_t *col, size_t *row,
+int int_(const char *buf, long fileSize, struct source_pos *sp,
          struct token *token) {
   /*puts("here");*/
-  if (!isdigit(buf[*pos])) {
+  if (!isdigit(buf[sp->pos])) {
     return 0;
   }
 
-  char ret = many(isdigit, buf, fileSize, pos, col, row, token);
+  char ret = many(isdigit, buf, fileSize, sp, token);
   token->type = TOKEN_INT;
   return ret;
 }
 
-int float_(const char *buf, long fileSize, long *pos, size_t *col, size_t *row,
+int float_(const char *buf, long fileSize, struct source_pos *sp,
            struct token *token) {
   size_t tempSize = 0;
   char *tempStr = NULL;
-  if (!try(int_, buf, fileSize, pos, col, row, token)) {
+  if (!try(int_, buf, fileSize, sp, token)) {
     return 0;
   }
   tempStr = token->string;
   tempSize = token->string_size;
 
-  if (buf[*pos] != '.') {
+  if (buf[sp->pos] != '.') {
     return 0;
   }
-  ++*pos;
+  sp->pos++;
 
-  printf("int: %c\n", buf[*pos]);
-  if (!try(int_, buf, fileSize, pos, col, row, token)) {
+  if (!try(int_, buf, fileSize, sp, token)) {
     return 0;
   }
 
-  puts("here");
   tempStr =
       reallocarray(tempStr, tempSize + 1 + token->string_size, sizeof(char));
   if (tempStr == NULL) {

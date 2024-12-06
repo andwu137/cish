@@ -3,6 +3,12 @@
 
 #include <stddef.h>
 
+struct source_pos {
+  long pos;
+  long col;
+  long row;
+};
+
 enum token_type {
   TOKEN_FN,
   TOKEN_DF,
