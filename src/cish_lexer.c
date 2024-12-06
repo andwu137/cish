@@ -10,7 +10,7 @@
 /* PROTOTYPES */
 void lex(const char *filename);
 
-int many(int (*predicate)(int), const char *buf, long fileSize,
+int many(int (*predicate)(int), long initSize, const char *buf, long fileSize,
          struct source_pos *sp, struct token *token);
 int try(int (*parser)(const char *buf, long fileSize, struct source_pos *sp,
                       struct token *token),
@@ -214,9 +214,9 @@ int try(int (*parser)(const char *buf, long fileSize, struct source_pos *sp,
   return 1;
 }
 
-int many(int (*predicate)(int), const char *buf, long fileSize,
+int many(int (*predicate)(int), long initSize, const char *buf, long fileSize,
          struct source_pos *sp, struct token *token) {
-  struct string str = string_new(1 << 5);
+  struct string str = string_new(initSize > 0 ? 1 << 5 : initSize);
 
   for (; sp->pos < fileSize && predicate(buf[sp->pos]); sp->pos++) {
     next_pos(buf[sp->pos], &sp->col, &sp->row);
@@ -236,7 +236,7 @@ int ident_(const char *buf, long fileSize, struct source_pos *sp,
     return 0;
   }
 
-  char ret = many(valid_ident_char, buf, fileSize, sp, token);
+  char ret = many(valid_ident_char, 32, buf, fileSize, sp, token);
   token->type = TOKEN_IDENT;
   return ret;
 }
@@ -247,7 +247,7 @@ int int_(const char *buf, long fileSize, struct source_pos *sp,
     return 0;
   }
 
-  char ret = many(isdigit, buf, fileSize, sp, token);
+  char ret = many(isdigit, 8, buf, fileSize, sp, token);
   token->type = TOKEN_INT;
   return ret;
 }
