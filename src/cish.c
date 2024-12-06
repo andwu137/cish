@@ -3,7 +3,7 @@
 #include "cish_parser.c"
 
 int main() {
-  const char *filename = "test/samples/outline.csh";
+  const char *filename = "test/samples/outline.cih";
   lex(filename);
 
   return 0;
