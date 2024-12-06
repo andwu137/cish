@@ -256,6 +256,8 @@ int float_(const char *buf, long fileSize, struct source_pos *sp,
            struct token *token) {
   size_t tempSize = 0;
   char *tempStr = NULL;
+
+  // Parse
   if (!try(int_, buf, fileSize, sp, token)) {
     return 0;
   }
@@ -271,6 +273,7 @@ int float_(const char *buf, long fileSize, struct source_pos *sp,
     return 0;
   }
 
+  // Merge
   tempStr =
       reallocarray(tempStr, tempSize + 1 + token->string_size, sizeof(char));
   if (tempStr == NULL) {
