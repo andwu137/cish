@@ -18,6 +18,8 @@ enum token_type {
   TOKEN_CLOSE_PAREN,
   TOKEN_OPEN_BRACE,
   TOKEN_CLOSE_BRACE,
+  TOKEN_OPEN_BRACKET,
+  TOKEN_CLOSE_BRACKET,
 };
 
 struct token {

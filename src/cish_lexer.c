@@ -54,6 +54,17 @@ void lex(const char *filename) {
     bufTok.string = NULL;
 
     switch (fileBuf[i]) {
+    case '[': {
+      bufTok.type = TOKEN_OPEN_BRACKET;
+      token_array_push(&tokens, &bufTok);
+      i++;
+    } break;
+    case ']': {
+      bufTok.type = TOKEN_CLOSE_BRACKET;
+      token_array_push(&tokens, &bufTok);
+      i++;
+    } break;
+
     case '(': {
       bufTok.type = TOKEN_OPEN_PAREN;
       token_array_push(&tokens, &bufTok);
@@ -122,6 +133,13 @@ void lex(const char *filename) {
     } break;
     case TOKEN_CLOSE_PAREN: {
       printf(")");
+    } break;
+
+    case TOKEN_OPEN_BRACKET: {
+      printf("[");
+    } break;
+    case TOKEN_CLOSE_BRACKET: {
+      printf("]");
     } break;
 
     case TOKEN_OPEN_BRACE: {
