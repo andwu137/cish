@@ -278,7 +278,7 @@ int lex_float(const char *buf, long fileSize, struct source_pos *sp,
   tempStr = token->string;
   tempSize = token->string_size;
 
-  if (buf[sp->pos] != '.') {
+  if (sp->pos < fileSize && buf[sp->pos] != '.') {
     free_null(token->string);
     return 0;
   }
