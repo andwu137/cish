@@ -1,5 +1,6 @@
 fn (main argc argv) {
-    (print (fib 5000))
+    (print (fib 5))
+    ((. print fib) 5000)
     (putStrLn (show (fac 5)))
     df ((f5) {(float (fib 5))}
         (answer) {5.0}) {
