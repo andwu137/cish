@@ -17,7 +17,8 @@ int lex_try(int (*parser)(const char *buf, long fileSize, struct source_pos *sp,
             const char *buf, long fileSize, struct source_pos *sp,
             struct token *token);
 
-int lex_valid_ident_char(int c);
+int lex_is_ident_char(int c);
+int lex_is_whitespace(int c);
 
 void lex_next_pos(char c, long *col, long *row);
 
@@ -47,6 +48,7 @@ void lex(const char *filename) {
   struct token_array tokens = token_array_new(1 << 17);
   struct token bufTok;
   struct source_pos sp = {.pos = 0, .col = 0, .row = 1};
+  long prevErrorPos = -1;
 
   while (sp.pos < fileSize) {
     lex_next_pos(fileBuf[sp.pos], &sp.col, &sp.row);
@@ -110,6 +112,11 @@ void lex(const char *filename) {
                  lex_int(fileBuf, fileSize, &sp, &bufTok)) {
         token_array_push(&tokens, &bufTok);
       } else {
+        if (!lex_is_whitespace(fileBuf[sp.pos]) && prevErrorPos + 1 != sp.pos) {
+          printf("Unexpected Char at (%lu, %lu): '%c'\n", sp.col, sp.row,
+                 fileBuf[sp.pos]);
+          prevErrorPos = sp.pos;
+        }
         sp.pos++;
       }
     } break;
@@ -187,11 +194,13 @@ void print_tokens(struct token_array *tokens) {
   }
 }
 
-int lex_valid_ident_char(int c) {
+int lex_is_ident_char(int c) {
   return isalnum(c) || c == '-' || c == '+' || c == '=' || c == '_' ||
          c == '!' || c == '@' || c == '#' || c == '$' || c == '%' || c == '%' ||
          c == '^' || c == '&' || c == '*' || c == '/' || c == '~';
 }
+
+int lex_is_whitespace(int c) { return isblank(c) || c == '\r' || c == '\n'; }
 
 void lex_next_pos(char c, long *col, long *row) {
   if (c == '\n') {
@@ -210,10 +219,6 @@ int lex_try(int (*parser)(const char *buf, long fileSize, struct source_pos *sp,
   size_t c = sp->col;
   size_t r = sp->row;
   if (!parser(buf, fileSize, sp, token)) {
-    if (token->string != NULL) {
-      free_null(token->string);
-    }
-
     sp->pos = p;
     sp->col = c;
     sp->row = r;
@@ -241,11 +246,11 @@ int lex_many(int (*predicate)(int), long initSize, const char *buf,
 int lex_ident(const char *buf, long fileSize, struct source_pos *sp,
               struct token *token) {
   // NOTE: inefficient, checks, then unchecks digit
-  if (!lex_valid_ident_char(buf[sp->pos]) || isdigit(buf[sp->pos])) {
+  if (!lex_is_ident_char(buf[sp->pos]) || isdigit(buf[sp->pos])) {
     return 0;
   }
 
-  char ret = lex_many(lex_valid_ident_char, 32, buf, fileSize, sp, token);
+  char ret = lex_many(lex_is_ident_char, 32, buf, fileSize, sp, token);
   token->type = TOKEN_IDENT;
   return ret;
 }
