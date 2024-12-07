@@ -28,6 +28,8 @@ int lex_float(const char *buf, long fileSize, struct source_pos *sp,
 int lex_int(const char *buf, long fileSize, struct source_pos *sp,
             struct token *token);
 
+void print_tokens(struct token_array *tokens);
+
 /* FUNCTIONS */
 void lex(const char *filename) {
   long fileSize = 0;
@@ -115,10 +117,24 @@ void lex(const char *filename) {
   }
 
   puts("<<TOKENIZE>>");
-  for (size_t i = 0; i < tokens.size; i++) {
-    printf("(%lu, %lu): ", tokens.buffer[i].col, tokens.buffer[i].row);
+  print_tokens(&tokens);
+  puts("\n");
 
-    switch (tokens.buffer[i].type) {
+  for (size_t i = 0; i < tokens.size; i++) {
+    if (tokens.buffer[i].string != NULL) {
+      free_null(tokens.buffer[i].string);
+    }
+  }
+
+  token_array_delete(&tokens);
+  free(fileBuf);
+}
+
+void print_tokens(struct token_array *tokens) {
+  for (size_t i = 0; i < tokens->size; i++) {
+    printf("(%lu, %lu): ", tokens->buffer[i].col, tokens->buffer[i].row);
+
+    switch (tokens->buffer[i].type) {
     case TOKEN_FN: {
       printf("FN");
     } break;
@@ -162,18 +178,13 @@ void lex(const char *filename) {
     } break;
     }
 
-    if (tokens.buffer[i].string != NULL) {
-      fwrite(tokens.buffer[i].string, tokens.buffer[i].string_size,
+    if (tokens->buffer[i].string != NULL) {
+      fwrite(tokens->buffer[i].string, tokens->buffer[i].string_size,
              sizeof(char), stdout);
-      free_null(tokens.buffer[i].string);
     }
 
     puts("");
   }
-  puts("\n");
-
-  token_array_delete(&tokens);
-  free(fileBuf);
 }
 
 int lex_valid_ident_char(int c) {
