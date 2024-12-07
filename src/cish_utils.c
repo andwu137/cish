@@ -22,12 +22,18 @@
     __min_a__ < __min_b__ ? __min_a__ : __min_b__;                             \
   })
 
+#define free_null(x)                                                           \
+  ({                                                                           \
+    free(x);                                                                   \
+    x = NULL;                                                                  \
+  })
+
 /* PROTOTYPES */
-char getFileSize(const char *filename, long *size);
-char readFile(const char *filename, char **outBuf, long *outBufSize);
+char get_file_size(const char *filename, long *size);
+char read_file(const char *filename, char **outBuf, long *outBufSize);
 
 /* FUNCTIONS */
-char getFileSize(const char *filename, long *size) {
+char get_file_size(const char *filename, long *size) {
   struct stat st;
   if (stat(filename, &st)) {
     return 0;
@@ -37,10 +43,10 @@ char getFileSize(const char *filename, long *size) {
   return 1;
 }
 
-char readFile(const char *filename, char **outBuf, long *outBufSize) {
+char read_file(const char *filename, char **outBuf, long *outBufSize) {
   char retval = 0;
 
-  if (!getFileSize(filename, outBufSize)) {
+  if (!get_file_size(filename, outBufSize)) {
     goto EXIT;
   }
   *outBuf = calloc(*outBufSize, sizeof(**outBuf));
@@ -51,8 +57,7 @@ char readFile(const char *filename, char **outBuf, long *outBufSize) {
   }
 
   if (!fread(*outBuf, *outBufSize, sizeof(**outBuf), fptr)) {
-    free(*outBuf);
-    *outBuf = NULL;
+    free_null(*outBuf);
     goto FILE_EXIT;
   }
 
